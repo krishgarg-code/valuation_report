@@ -64,9 +64,67 @@ export function FormWizard({ form, onSubmit, currentStep, setCurrentStep }: Form
     }
   };
 
+  // Keyboard navigation on step change - auto focus first input
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      const firstInput = document.querySelector('form input:not([type="hidden"]), form select, form textarea') as HTMLElement;
+      if (firstInput) {
+        firstInput.focus();
+      }
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [currentStep]);
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLFormElement>) => {
+    if (e.key === "Enter") {
+      const target = e.target as HTMLElement;
+      
+      // If it's a button, let the standard click/interaction happen
+      if (target.tagName === "BUTTON") {
+        return;
+      }
+      
+      // If it's a textarea, let it insert a newline unless Ctrl or Cmd is pressed
+      if (target.tagName === "TEXTAREA" && !e.ctrlKey && !e.metaKey) {
+        return;
+      }
+      
+      e.preventDefault();
+      
+      const formEl = e.currentTarget;
+      const inputs = Array.from(formEl.querySelectorAll('input:not([type="hidden"]), select, textarea')) as HTMLElement[];
+      
+      const activeInputs = inputs.filter(el => {
+        const rect = el.getBoundingClientRect();
+        const isVisible = rect.width > 0 && rect.height > 0;
+        return isVisible && !el.hasAttribute('disabled') && el.getAttribute('tabindex') !== '-1';
+      });
+      
+      const currentIndex = activeInputs.indexOf(target);
+      
+      if (currentIndex !== -1) {
+        if (currentIndex < activeInputs.length - 1) {
+          activeInputs[currentIndex + 1].focus();
+        } else {
+          // Last input of the step
+          if (currentStep < totalSteps - 1) {
+            nextStep();
+          } else {
+            // Last step, submit the form
+            form.handleSubmit(onSubmit)();
+          }
+        }
+      }
+    }
+  };
+
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6 flex flex-col h-full font-sans text-[#1c281a]">
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        onKeyDown={handleKeyDown}
+        className="space-y-6 flex flex-col h-full font-sans text-[#1c281a]"
+      >
         {/* Form Container (Scrollable) */}
         <div className="flex-1 overflow-y-auto pr-1">
           <div className="bg-[#fcfbfa] border-2 border-[#1c281a] p-8 md:p-12 rounded-none shadow-sm space-y-8">
