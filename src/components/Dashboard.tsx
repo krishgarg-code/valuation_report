@@ -138,7 +138,7 @@ export default function Dashboard() {
         <div className="p-6 border-b border-[#2c3d2a]/60 shrink-0">
           <div className="flex flex-col">
             <h1 className="text-xl font-black tracking-tight text-white leading-tight uppercase font-sans">
-              VALUATION <span className="text-[#b8c070]">CERTIFY</span>
+              VALUATION <span className="text-[#b8c070]">REPORT</span>
             </h1>
           </div>
         </div>

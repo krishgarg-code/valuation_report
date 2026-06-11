@@ -19,7 +19,7 @@ const oswald = Oswald({
 });
 
 export const metadata: Metadata = {
-  title: "Valuation Certify — Punjab & Sind Bank Property Report Generator",
+  title: "Valuation Report",
   description: "Professional property valuation report generator for Punjab & Sind Bank — auto-fills, calculates, and exports bank-format reports.",
 };
 
